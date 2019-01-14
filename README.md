@@ -6,7 +6,6 @@ Sample Stub with the following technologies:
     Slf4j
     Lombok
 
-
 To run all tests:
   gradle clean test --tests packages.scenarios*
 
@@ -22,7 +21,7 @@ To run Specific test class:
   gradle -Dtest.single=AcceptanceTest
 
 Reports:
-    Generate report:
-        gradle allureReport
-    Start web application test Report:
-        gradle allureServe
+Generate report:
+    gradle allureReport
+Start web application test Report:
+    gradle allureServe
