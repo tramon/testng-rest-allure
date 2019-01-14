@@ -1,0 +1,65 @@
+plugins {
+    id "io.qameta.allure" version '2.5'
+    id 'net.ltgt.apt' version '0.10'
+}
+
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'io.qameta.allure'
+
+repositories {
+    mavenCentral()
+}
+
+defaultTasks 'clean', 'test', 'allureServe'
+sourceCompatibility = JavaVersion.VERSION_1_8
+targetCompatibility = JavaVersion.VERSION_1_8
+
+ext {
+    allureVersion = '2.8.1'
+    testNgVersion = '6.14.3'
+    assertjVersion = '3.11.1'
+    slf4jVersion = '1.6.1'
+    restAssuredVersion = '3.0.3'
+    lombokVersion = '1.18.4'
+}
+
+dependencies {
+    testCompile "org.testng:testng:${testNgVersion}"
+    testCompile "org.assertj:assertj-core:${assertjVersion}"
+    testCompile "org.slf4j:slf4j-simple:${slf4jVersion}"
+    testCompile "io.qameta.allure:allure-testng:${allureVersion}"
+    testCompile "io.rest-assured:rest-assured:${restAssuredVersion}"
+    compile "org.projectlombok:lombok:${lombokVersion}"
+    testCompile "org.projectlombok:lombok:${lombokVersion}"
+    apt "org.projectlombok:lombok:${lombokVersion}"
+}
+
+allure {
+    version = '2.1.1'
+    autoconfigure = true
+    useTestNG {
+        version = '2.0-BETA10'
+    }
+    downloadLink = 'https://dl.bintray.com/qameta/generic/io/qameta/allure/allure/2.1.1/allure-2.1.1.zip'
+    resultsDir = file("$project.buildDir//allure-results")
+    reportDir = file("$project.buildDir//allure-report")
+}
+
+test {
+    ignoreFailures = true
+    useTestNG() {
+        parallel = "classes"
+        threadCount = System.getProperty('threadCount', '1')
+        includeGroups System.getProperty('includeGroups', '')
+        outputDirectory = file("$project.buildDir//site")
+        useDefaultListeners = true
+    }
+    tasks.withType(Test) {
+        testLogging {
+            events "standardOut", "standard_error", "started", "passed", "skipped", "failed"
+            exceptionFormat 'full'
+            info.events = ["failed", "skipped"]
+        }
+    }
+}
